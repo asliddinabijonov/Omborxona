@@ -11,7 +11,7 @@ class Sotuv(models.Model):
     summa = models.FloatField()
     tolandi = models.FloatField(default=0)
     qarz = models.FloatField(default=0)
-    sana = models.DateTimeField(auto_now_add=True)
+    sana = models.DateTimeField()
     tarqatuvchi = models.ForeignKey(Tarqatuvchi, on_delete=models.CASCADE)
 
     def __str__(self):

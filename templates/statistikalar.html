@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block active_si %}rgba(0,0,0,0){% endblock %}
+{% block active_si %}active{% endblock %}
 {% block content %}
 
     <!-- Content Wrapper. Contains page content -->
@@ -27,6 +27,8 @@
                         <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                             Statistika qo'shish
                         </button>
+                        <h5>Summa: {{ statistika.summa }} so'm</h5>
+                        <h5>Qarz: {{ statistika.qarz }} so'm</h5>
                     </div>
                 </div>
                 <div class="card-body">
@@ -34,8 +36,8 @@
                         <thead>
                         <tr>
                             <th scope="col" style="width: 15px">T/r</th>
-                            <th scope="col" style="width: 255px; text-align: center;">Product</th>
-                            <th scope="col" style="text-align: center;">Client</th>
+                            <th scope="col" style="width: 255px; text-align: center;">Mahsulot</th>
+                            <th scope="col" style="text-align: center;">Mijoz</th>
                             <th scope="col" style="text-align: center;">Sana</th>
                             <th scope="col" style="text-align: center;">Miqdor</th>
                             <th scope="col" style="text-align: center;">Umumiy summa</th>
@@ -48,22 +50,23 @@
                         {% for sotuv in sotuvlar %}
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
-                                <td>{{ sotuv.mahsulot.nom }}, {{ sotuv.mahsulot.brand}}</td>
-                                <td>{{ sotuv.mijoz.ism}}, {{ sotuv.mijoz.dokon }}</td>
-                                <td>{{ sotuv.sana}}</td>
-                                <td>{{ sotuv.miqdor }}</td>
+                                <td>{{ sotuv.mahsulot.nom }}, {{ sotuv.mahsulot.brand }}</td>
+                                <td>{{ sotuv.mijoz.ism }}, {{ sotuv.mijoz.dokon }}</td>
+                                <td>{{ sotuv.sana }}</td>
+                                <td>{{ sotuv.miqdor }} {{ sotuv.mahsulot.olchov }}</td>
                                 <td>{{ sotuv.summa }} so'm</td>
                                 <td>{{ sotuv.tolandi }} so'm</td>
                                 <td>{{ sotuv.qarz }} so'm</td>
                                 <td>
-                                    <a href="#">
+                                    <a href="/stats/statistika/{{ sotuv.id }}/update/">
                                         <button type="submit" class="btn btn-warning" data-toggle="modal">Tahrirlash
                                         </button>
                                     </a>
-                                    <a href="#">
-                                        <button type="submit" class="btn btn-danger" data-toggle="modal">Ochirish
-                                        </button>
-                                    </a>
+
+                                    <button type="submit" class="btn btn-danger" data-toggle="modal"
+                                            data-target="#myModaldelete{{ sotuv.id }}">
+                                        O'chirish
+                                    </button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -73,6 +76,27 @@
             </div>
         </div>
 
+      {% for sotuv in sotuvlar %}
+            <div class="modal" id="myModaldelete{{ sotuv.id }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark">
+                            <h4 class="modal-title">Mahsulotni o'chirish</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <h5 class="container">Haqiqatdan ham mahsulotni o'chirmoqchimisiz?</h5>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="/stats/statistika/{{ sotuv.id }}/delete/">
+                                <button type="button" class="btn btn-success">Ha</button>
+                            </a>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Yo'q</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
         <!-- The Modal -->
         <div class="modal" id="myModal">
             <div class="modal-dialog">
@@ -80,40 +104,46 @@
 
                     <!-- Modal Header -->
                     <div class="modal-header bg-dark">
-                        <h4 class="modal-title">Yangi statistika</h4>
+                        <h4 class="modal-title">Sotuv mahsulot</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
                     <!-- Modal body -->
-                    <form action="#" id="new-product-form" method="post">{% csrf_token %}
+                    <form method="post" id="new-product-form">
+                        {% csrf_token %}
                         <div class="modal-body">
-                            <label for="product">Product:</label>
-                            <input type="datetime-local" name="sana" placeholder="Sana" id="product"
+                            <label for="new-product-name">Mahsulotlar:</label>
+                            <select name="mahsulot" class="form-control">
+                                {% for mahsulot in mahsulotlar %}
+                                    <option value="{{ mahsulot.id }}">{{ mahsulot.nom }}, {{ mahsulot.narx2 }} so'm</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <label for="new-client-name">Mijozlar:</label>
+                            <select name="mijoz" class="form-control">
+                                {% for mijoz in mijozlar %}
+                                    <option value="{{ mijoz.id }}">{{ mijoz.ism }}, {{ mijoz.dokon }}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <label for="new-product-name">Sanasi:</label>
+                            <input type="date" name="sana" value="2000-01-01" id="new-product-amount" class="form-control">
+                            <br>
+                            <label for="new-product-name">Miqdor:</label>
+                            <input type="number" name="miqdor" placeholder="Miqdor narxi..." id="new-product-price"
                                    class="form-control" required>
                             <br>
-                            <label for="client">Client:</label>
-                            <input type="datetime-local" name="sana" placeholder="Sana" id="client" class="form-control"
-                                   required>
+                            <label for="new-product-name">Umumiy summa:</label>
+                            <input type="number" name="summa" value="0" id="new-product-price"
+                                   class="form-control">
                             <br>
-                            <label for="sana">Sana:</label>
-                            <input type="datetime-local" name="sana" placeholder="Sana" id="sana" class="form-control"
-                                   required>
+                            <label for="new-product-name">To'landi:</label>
+                            <input type="number" name="tolandi" value="0"
+                                   id="new-product-amount" class="form-control">
                             <br>
-                            <label for="miqdor">Miqdor:</label>
-                            <input type="number" name="miqdor" placeholder="Miqdor" id="miqdor" class="form-control"
-                                   required>
-                            <br>
-                            <label for="umumiy_summa">Umumiy summa:</label>
-                            <input type="number" name="summa" placeholder="Umumiy summa" id="umumiy_summa"
-                                   class="form-control" required>
-                            <br>
-                            <label for="nasiya">Nasiya:</label>
-                            <input type="number" name="nasiya" placeholder="Nasiya" id="nasiya" class="form-control"
-                                   required>
-                            <br>
-                            <label for="tolandi">To'landi:</label>
-                            <input type="number" name="tolandi" placeholder="To'landi" id="tolandi" class="form-control"
-                                   required>
+                            <label for="new-product-name">Qarz:</label>
+                            <input type="number" name="qarz" value="0"
+                                   id="new-product-amount" class="form-control">
                             <br>
                         </div>
 
@@ -123,7 +153,6 @@
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Yopish</button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

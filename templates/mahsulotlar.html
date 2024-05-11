@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block active_ma %}rgba(0,0,0,0){% endblock %}
+{% block active_ma %}active{% endblock %}
 {% block content %}
 
     <!-- Content Wrapper. Contains page content -->
@@ -54,14 +54,15 @@
                                 <td>{{ mahsulot.miqdor }} {{ mahsulot.olchov }}</td>
                                 <td>{{ mahsulot.sana|date:'Y-m-d' }}</td>
                                 <td>
-                                    <a href="#">
+                                    <a href="/main/mahsulotlar/{{ mahsulot.id }}/update/">
                                         <button type="submit" class="btn btn-warning" data-toggle="modal">Tahrirlash
                                         </button>
                                     </a>
-                                    <a href="/main/mahsulotlar/{{ mahsulot.id }}/delete">
-                                        <button type="submit" class="btn btn-danger" data-toggle="modal">O'chirish
-                                        </button>
-                                    </a>
+
+                                    <button type="submit" class="btn btn-danger" data-toggle="modal"
+                                            data-target="#myModaldelete{{ mahsulot.id }}">
+                                        O'chirish
+                                    </button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -70,6 +71,27 @@
                 </div>
             </div>
         </div>
+        {% for mahsulot in mahsulotlar %}
+            <div class="modal" id="myModaldelete{{ mahsulot.id }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark">
+                            <h4 class="modal-title">Mahsulotni o'chirish</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <h5 class="container">Haqiqatdan ham mahsulotni o'chirmoqchimisiz?</h5>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="/main/mahsulotlar/{{ mahsulot.id }}/delete/">
+                                <button type="button" class="btn btn-success">Ha</button>
+                            </a>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Yo'q</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
 
         <!-- The Modal -->
         <div class="modal" id="myModal">
@@ -83,23 +105,34 @@
                     </div>
 
                     <!-- Modal body -->
-                    <form action="#" id="new-product-form">
+                    <form method="post" id="new-product-form">
+                        {% csrf_token %}
                         <div class="modal-body">
                             <label for="new-product-name">Nomi:</label>
-                            <input type="text" name="pr_name" placeholder="Mahsulot nomi..." id="new-product-name"
+                            <input type="text" name="nom" placeholder="Mahsulot nomi..." id="new-product-name"
                                    class="form-control" required>
                             <br>
                             <label for="new-product-name">Brend:</label>
-                            <input type="text" name="pr_brand" placeholder="Mahsulot brendi..." id="new-product-brend"
-                                   class="form-control" required>
+                            <input type="text" name="brand" placeholder="Mahsulot brendi..." id="new-product-brend"
+                                   class="form-control">
                             <br>
-                            <label for="new-product-name">Narxi:</label>
-                            <input type="text" name="pr_price" placeholder="Maxsulot narxi..." id="new-product-price"
+                            <label for="new-product-name">Keldi:</label>
+                            <input type="number" name="narx1" placeholder="Maxsulot narxi..." id="new-product-price"
                                    class="form-control" required>
+                            <label for="new-product-name">Sotish:</label>
+                            <input type="number" name="narx2" placeholder="Maxsulot narxi..." id="new-product-price"
+                                   class="form-control">
                             <br>
                             <label for="new-product-name">Miqdori:</label>
-                            <input type="number" name="pr_amount" placeholder="Mahsulot miqdori..."
+                            <input type="number" name="miqdor" placeholder="Mahsulot miqdori..."
                                    id="new-product-amount" class="form-control" required>
+                            <br>
+                            <label for="new-product-name">O'lchov:</label>
+                            <input type="text" name="olchov" placeholder="Mahsulot miqdori..."
+                                   id="new-product-amount" class="form-control" required>
+                            <br>
+                            <label for="new-product-name">Kelgan sanasi:</label>
+                            <input type="date" name="sana" id="new-product-amount" class="form-control">
                             <br>
                         </div>
 
@@ -109,10 +142,9 @@
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Yopish</button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
-        <!-- ./wrapper -->
+
     </div>
 {% endblock %}

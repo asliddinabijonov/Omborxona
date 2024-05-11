@@ -2,22 +2,23 @@
 <html lang="en">
 <head>
     {% load static %}
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Products</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Products</title>
 
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-  <!-- IonIcons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- IonIcons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <!--
 `body` tag options:
@@ -29,54 +30,65 @@
   * sidebar-mini
 -->
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper container">
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Products</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{% url 'stats' %}">Home</a></li>
-              <li class="breadcrumb-item active">Products</li>
-              <li class="breadcrumb-item"><a href="{% url 'logout' %}">Logout</a></li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <br>
+                        <h1 class="m-0">Products</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
 
 
-          <!-- Modal Header -->
+        <!-- Modal Header -->
 
-          <!-- Modal body -->
-          <form action="#" id="edit-product-form">
-              <label for="edit-product-name">Mahsulot nomi:</label>
-              <input type="text" name="name" value="{{product.name}}" placeholder="Mahsulot nomi..." id="edit-product-name" class="form-control" required>
+        <!-- Modal body -->
+        <form method="post" id="new-product-form">
+            {% csrf_token %}
+            <div class="modal-body">
+                <label for="new-product-name">Nomi:</label>
+                <input type="text" name="nom" placeholder="Mahsulot nomi..." id="new-product-name"
+                       class="form-control" value="{{ mahsulot.nom }}" required>
                 <br>
-              <label for="edit-product-name">Brend nomi:</label>
-              <input type="text" name="brand_name" value="{{product.brand_name}}" placeholder="Brend nomi..." id="edit-product-brend" class="form-control" required>
-              <br>
-              <label for="edit-product-name">Mahsulot narxi:</label>
-              <input type="number" name="price" value="{{product.price}}" placeholder="Mahsulot narxi..." id="edit-product-price" class="form-control" required>
-              <br>
-              <label for="edit-product-name">Dona qoldi:</label>
-              <input type="number" name="amount" value="{{product.remainder}}" placeholder="Dona qoldi..." id="edit-product-amount" class="form-control" required>
-              <br>
+                <label for="new-product-name">Brend:</label>
+                <input type="text" name="brand" placeholder="Mahsulot brendi..." id="new-product-brend"
+                       class="form-control" value="{{ mahsulot.brand }}">
+                <br>
+                <label for="new-product-name">Keldi:</label>
+                <input type="number" name="narx1" placeholder="Maxsulot narxi..." id="new-product-price"
+                       class="form-control" value="{{ mahsulot.narx1 }}" required>
+                <br>
+                <label for="new-product-name">Sotish:</label>
+                <input type="number" name="narx2" placeholder="Maxsulot narxi..." id="new-product-price"
+                       class="form-control" value="{{ mahsulot.narx2 }}">
+                <br>
+                <label for="new-product-name">Miqdori:</label>
+                <input type="number" name="miqdor" placeholder="Mahsulot miqdori..."
+                       id="new-product-amount" class="form-control" value="{{ mahsulot.miqdor }}" required>
+                <br>
+                <label for="new-product-name">O'lchov:</label>
+                <input type="text" name="olchov" placeholder="Mahsulot miqdori..."
+                       id="new-product-amount" class="form-control" value="{{ mahsulot.olchov }}" required>
+            </div>
 
-          <!-- Modal footer -->
-            <button type="submit" class="btn btn-success">Yangilash</button>
-            <a href="/goods/"><button type="button" class="btn btn-danger" data-dismiss="modal">Yopish</button></a>
-
-      </form>
-
-
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Yangilash</button>
+                <a href="/main/mahsulotlar/">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Yopish</button>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- ./wrapper -->
 
