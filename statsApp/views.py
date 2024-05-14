@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from django.shortcuts import render, redirect
 from django.views import View
+from datetime import datetime
 
 from .models import *
 
@@ -28,14 +27,14 @@ class SotuvViews(View):
 
     def post(self, request):
         if request.user.is_authenticated:
-            summa = request.POST.get('summa')
+            summa = float(request.POST.get('summa', 0))
             mahsulot = Mahsulot.objects.get(id=request.POST.get('mahsulot'))
             mijoz = Mijoz.objects.get(id=request.POST.get('mijoz'))
-            miqdor = float(request.POST.get('miqdor'))
-            if int(summa) == 0:
+            miqdor = float(request.POST.get('miqdor', 0))
+            if summa == 0:
                 summa = float(mahsulot.narx2) * miqdor
-            tolandi = float(request.POST.get('tolandi'))
-            qarz = float(request.POST.get('qarz'))
+            tolandi = float(request.POST.get('tolandi', 0))
+            qarz = float(request.POST.get('qarz', 0))
             if tolandi == 0 and qarz == 0:
                 qarz = summa
             elif tolandi == 0 and qarz != 0:
@@ -49,9 +48,9 @@ class SotuvViews(View):
             sana = request.POST.get('sana')
             if sana == '2000-01-01':
                 sana = datetime.now().strftime('%Y-%m-%d')
-            if float(miqdor) > float(mahsulot.miqdor):
+            if miqdor > mahsulot.miqdor:
                 return redirect('statistika')
-            Sotuv.objects.create(
+            sotuv = Sotuv.objects.create(
                 tarqatuvchi=request.user,
                 mahsulot=mahsulot,
                 mijoz=mijoz,
@@ -67,6 +66,60 @@ class SotuvViews(View):
             mijoz.save()
             return redirect('statistika')
         return redirect('login')
+
+
+class UpdateViews(View):
+    def get(self, request, pk):
+        if request.user.is_authenticated:
+            sotuv = Sotuv.objects.get(tarqatuvchi=request.user, id=pk)
+            mahsulot = Mahsulot.objects.get(id=pk, tarqatuvchi=request.user)
+            mijoz = Mijoz.objects.get(id=pk, tarqatuvchi=request.user)
+            context = {
+                'sotuv': sotuv,
+                'mahsulot': mahsulot,
+                'mijoz': mijoz,
+            }
+            return render(request, 'statistika-tahrirlash.html', context)
+        return redirect('login')
+
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            sotuv = Sotuv.objects.get(id=pk, tarqatuvchi=request.user)
+            summa = float(request.POST.get('summa', 0))
+            mahsulot = Mahsulot.objects.get(id=request.POST.get('mahsulot'))
+            mijoz = Mijoz.objects.get(id=request.POST.get('mijoz'))
+            miqdor = float(request.POST.get('miqdor', 0))
+            if summa == 0:
+                summa = float(mahsulot.narx2) * miqdor
+            tolandi = float(request.POST.get('tolandi', 0))
+            qarz = float(request.POST.get('qarz', 0))
+            if tolandi != 0 and qarz != 0:
+                qarz = summa - tolandi
+            elif tolandi == 0 and qarz != 0:
+                if summa < qarz:
+                    return redirect('statistika')
+                tolandi = summa - qarz
+            elif tolandi != 0 and qarz == 0:
+                if summa < tolandi:
+                    return redirect('statistika')
+                qarz = summa - tolandi
+
+            if miqdor > mahsulot.miqdor:
+                return redirect('statistika')
+            sotuv.summa = summa
+            sotuv.mahsulot = mahsulot
+            sotuv.mijoz = mijoz
+            sotuv.miqdor = miqdor
+            sotuv.tolandi = tolandi
+            sotuv.qarz = qarz
+            sotuv.save()
+            mahsulot.miqdor -= miqdor
+            mahsulot.save()
+            mijoz.qarz = sum(Sotuv.objects.filter(tarqatuvchi=request.user, mijoz=mijoz).values_list("qarz", flat=True))
+            mijoz.save()
+            return redirect('statistika')
+        return redirect('login')
+
 
 
 class DeleteSotuvView(View):

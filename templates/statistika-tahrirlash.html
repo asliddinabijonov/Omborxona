@@ -54,26 +54,39 @@
         <form method="post" id="new-product-form">
             {% csrf_token %}
             <div class="modal-body">
-                            <label for="new-product-name">FIO:</label>
-                            <input type="text" name="ism" value="{{ mijoz.ism }}"
-                                   class="form-control" required>
-                            <br>
-                            <label for="new-product-name">Do'kon nomi:</label>
-                            <input type="text" name="dokon" value="{{ mijoz.dokon }}" id="new-product-brend"
-                                   class="form-control">
-                            <br>
-                            <label for="new-product-name">Telefon:</label>
-                            <input type="number" name="tel" value="{{ mijoz.tel }}" id="new-product-price"
-                                   class="form-control" required>
-                            <br>
-                            <label for="new-product-name">Manzil:</label>
-                            <input type="text" name="manzil" value="{{ mijoz.manzil }}" id="new-product-price"
-                                   class="form-control">
-                            <br>
-                            <label for="new-product-name">Oluvchi:</label>
-                            <input type="text" name="oluvchi" value="{{ mijoz.oluvchi }}" id="new-product-price"
-                                   class="form-control">
-                        </div>
+                <label for="new-product-name">Mahsulotlar:</label>
+                <select name="mahsulot" class="form-control">
+                    <option value="{{ sotuv.mahsulot.id }}">{{ sotuv.mahsulot.nom }} {{ sotuv.mahsulot.narx2 }}</option>
+                    {% for mahsulot in mahsulotlar %}
+                        <option value="{{ mahsulot.id }}">{{ mahsulot.nom }}, {{ mahsulot.narx2 }} so'm</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="new-client-name">Mijozlar:</label>
+                <select name="mijoz" class="form-control">
+                    <option value="{{ sotuv.mijoz.id }}">{{ sotuv.mijoz.ism }}-{{ sotuv.mijoz.dokon }}</option>
+                    {% for mijoz in mijozlar %}
+                        <option value="{{ mijoz.id }}">{{ mijoz.ism }}, {{ mijoz.dokon }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="new-product-name">Miqdor:</label>
+                <input type="number" name="miqdor" value="{{ sotuv.miqdor }}" id="new-product-price"
+                       class="form-control" required>
+                <br>
+                <label for="new-product-name">Umumiy summa:</label>
+                <input type="number" name="summa" value="{{ sotuv.summa }}" id="new-product-price"
+                       class="form-control">
+                <br>
+                <label for="new-product-name">To'landi:</label>
+                <input type="number" name="tolandi" value="{{ sotuv.tolandi }}"
+                       id="new-product-amount" class="form-control">
+                <br>
+                <label for="new-product-name">Qarz:</label>
+                <input type="number" name="qarz" value="{{ sotuv.qarz }}"
+                       id="new-product-amount" class="form-control">
+                <br>
+            </div>
 
             <!-- Modal footer -->
             <div class="modal-footer">
