@@ -72,8 +72,8 @@ class UpdateViews(View):
     def get(self, request, pk):
         if request.user.is_authenticated:
             sotuv = Sotuv.objects.get(tarqatuvchi=request.user, id=pk)
-            mahsulot = Mahsulot.objects.get(id=pk, tarqatuvchi=request.user)
-            mijoz = Mijoz.objects.get(id=pk, tarqatuvchi=request.user)
+            mahsulot = Mahsulot.objects.get(id=sotuv.mahsulot.id, tarqatuvchi=request.user)
+            mijoz = Mijoz.objects.get(id=sotuv.mijoz.id, tarqatuvchi=request.user)
             context = {
                 'sotuv': sotuv,
                 'mahsulot': mahsulot,
@@ -84,42 +84,28 @@ class UpdateViews(View):
 
     def post(self, request, pk):
         if request.user.is_authenticated:
-            sotuv = Sotuv.objects.get(id=pk, tarqatuvchi=request.user)
-            summa = float(request.POST.get('summa', 0))
-            mahsulot = Mahsulot.objects.get(id=request.POST.get('mahsulot'))
-            mijoz = Mijoz.objects.get(id=request.POST.get('mijoz'))
-            miqdor = float(request.POST.get('miqdor', 0))
-            if summa == 0:
-                summa = float(mahsulot.narx2) * miqdor
-            tolandi = float(request.POST.get('tolandi', 0))
-            qarz = float(request.POST.get('qarz', 0))
-            if tolandi != 0 and qarz != 0:
-                qarz = summa - tolandi
-            elif tolandi == 0 and qarz != 0:
-                if summa < qarz:
-                    return redirect('statistika')
-                tolandi = summa - qarz
-            elif tolandi != 0 and qarz == 0:
-                if summa < tolandi:
-                    return redirect('statistika')
-                qarz = summa - tolandi
+            sotuv = Sotuv.objects.filter(id=pk, tarqatuvchi=request.user)
+            miqdor = float(request.POST.get('miqdor'))
+            mahsulot = sotuv.first().mahsulot
 
-            if miqdor > mahsulot.miqdor:
-                return redirect('statistika')
-            sotuv.summa = summa
-            sotuv.mahsulot = mahsulot
-            sotuv.mijoz = mijoz
-            sotuv.miqdor = miqdor
-            sotuv.tolandi = tolandi
-            sotuv.qarz = qarz
-            sotuv.save()
-            mahsulot.miqdor -= miqdor
-            mahsulot.save()
-            mijoz.qarz = sum(Sotuv.objects.filter(tarqatuvchi=request.user, mijoz=mijoz).values_list("qarz", flat=True))
-            mijoz.save()
+            if mahsulot.miqdor >= (miqdor - float(sotuv.first().miqdor)):
+                mahsulot.miqdor += float(sotuv.first().miqdor) - miqdor
+                mahsulot.save()
+
+            tolandi = request.POST.get('tolandi')
+            summa = request.POST.get('summa')
+            if sotuv.first().miqdor != miqdor:
+                summa = float(sotuv.first().mahsulot.narx2) * miqdor
+            qarz = float(summa) - float(tolandi)
+            sotuv.update(
+                tarqatuvchi=request.user,
+                miqdor=miqdor,
+                summa=summa,
+                tolandi=tolandi,
+                qarz=qarz,
+            )
             return redirect('statistika')
         return redirect('login')
-
 
 
 class DeleteSotuvView(View):
